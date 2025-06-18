@@ -14,15 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from .purchasing_agent import PurchasingAgent
+from .researcher_agent import ResearcherAgent
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
-root_agent = PurchasingAgent(
+root_agent = ResearcherAgent(
     remote_agent_addresses=[
-        os.getenv("PIZZA_SELLER_AGENT_URL", "http://localhost:10000"),
+        os.getenv("SCHOLAR_AGENT_URL", "http://localhost:10000"),
+        os.getenv("TEACHER_AGENT_URL", "http://localhost:10001"),
         os.getenv("BURGER_SELLER_AGENT_URL", "http://localhost:10001"),
     ]
 ).create_agent()

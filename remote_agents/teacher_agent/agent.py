@@ -32,74 +32,23 @@ memory = MemorySaver()
 class ResponseFormat(BaseModel):
     """Respond to the user in this format."""
 
-    status: Literal["input_required", "completed", "error"] = "input_required"
+    status: Literal["working", "completed", "error"] = "working"
     message: str
 
 
-class OrderItem(BaseModel):
-    name: str
-    quantity: int
-    price: int
-
-
-class Order(BaseModel):
-    order_id: str
-    status: str
-    order_items: list[OrderItem]
-
-
-@tool
-def create_pizza_order(order_items: list[OrderItem]) -> str:
-    """
-    Creates a new pizza order with the given order items.
-
-    Args:
-        order_items: List of order items to be added to the order.
-
-    Returns:
-        str: A message indicating that the order has been created.
-    """
-    try:
-        order_id = str(uuid.uuid4())
-        order = Order(order_id=order_id, status="created", order_items=order_items)
-        print("===")
-        print(f"order created: {order}")
-        print("===")
-    except Exception as e:
-        print(f"Error creating order: {e}")
-        return f"Error creating order: {e}"
-    return f"Order {order.model_dump()} has been created"
-
-
-class PizzaSellerAgent:
+class TeacherAgent:
     SYSTEM_INSTRUCTION = """
 # INSTRUCTIONS
 
-You are a specialized assistant for a pizza store.
-Your sole purpose is to answer questions about what is available on pizza menu and price also handle order creation.
-If the user asks about anything other than pizza menu or order creation, politely state that you cannot help with that topic and can only assist with pizza menu and order creation.
-Do not attempt to answer unrelated questions or use tools for other purposes.
-
-# CONTEXT
-
-Provided below is the available pizza menu and it's related price:
-- Margherita Pizza: IDR 100K
-- Pepperoni Pizza: IDR 140K
-- Hawaiian Pizza: IDR 110K
-- Veggie Pizza: IDR 100K
-- BBQ Chicken Pizza: IDR 130K
+You are a specialized teacher. Given information about a specific topic, you can break it down into a digestible learning plan, suitable for a student.
 
 # RULES
 
-- If user want to do something, you will be following this order:
-    1. Always ensure the user already confirmed the order and total price. This confirmation may already given in the user query.
-    2. Use `create_pizza_order` tool to create the order
-    3. Finally, always provide response to the user about the detailed ordered items, price breakdown and total, and order ID
-
-- Set response status to input_required if asking for user order confirmation.
+- You will be given a bunch of information. Your goal is to distill that information into a lesson that's teachable.
+- Set response status to working if you are thinking.
 - Set response status to error if there is an error while processing the request.
 - Set response status to completed if the request is complete.
-- DO NOT make up menu or price, Always rely on the provided menu given to you as context.
+- DO NOT make up any information. Always provide reliable information based on concrete data.
 """
     SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
 
@@ -109,10 +58,9 @@ Provided below is the available pizza menu and it's related price:
             location=os.getenv("GCLOUD_LOCATION"),
             project=os.getenv("GCLOUD_PROJECT_ID"),
         )
-        self.tools = [create_pizza_order]
         self.graph = create_react_agent(
             self.model,
-            tools=self.tools,
+            tools=[],
             checkpointer=memory,
             prompt=self.SYSTEM_INSTRUCTION,
             response_format=ResponseFormat,
@@ -127,27 +75,27 @@ Provided below is the available pizza menu and it's related price:
         current_state = self.graph.get_state(config)
         structured_response = current_state.values.get("structured_response")
         if structured_response and isinstance(structured_response, ResponseFormat):
-            if structured_response.status == "input_required":
+            if structured_response.status == "working":
                 return {
                     "is_task_complete": False,
-                    "require_user_input": True,
+                    "working": True,
                     "content": structured_response.message,
                 }
             elif structured_response.status == "error":
                 return {
                     "is_task_complete": False,
-                    "require_user_input": True,
+                    "working": True,
                     "content": structured_response.message,
                 }
             elif structured_response.status == "completed":
                 return {
                     "is_task_complete": True,
-                    "require_user_input": False,
+                    "working": False,
                     "content": structured_response.message,
                 }
 
         return {
             "is_task_complete": False,
-            "require_user_input": True,
+            "working": True,
             "content": "We are unable to process your request at the moment. Please try again.",
         }

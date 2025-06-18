@@ -30,7 +30,7 @@ from a2a_types import (
     InvalidParamsError,
 )
 from a2a_server.task_manager import InMemoryTaskManager
-from agent import BurgerSellerAgent
+from agent import ScholarAgent
 from a2a_server.push_notification_auth import PushNotificationSenderAuth
 import a2a_server.utils as utils
 from typing import Union
@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 class AgentTaskManager(InMemoryTaskManager):
     def __init__(
         self,
-        agent: BurgerSellerAgent,
+        agent: ScholarAgent,
         notification_sender_auth: PushNotificationSenderAuth,
     ):
         super().__init__()
@@ -55,12 +55,12 @@ class AgentTaskManager(InMemoryTaskManager):
         task_send_params: TaskSendParams = request.params
         if not utils.are_modalities_compatible(
             task_send_params.acceptedOutputModes,
-            BurgerSellerAgent.SUPPORTED_CONTENT_TYPES,
+            ScholarAgent.SUPPORTED_CONTENT_TYPES,
         ):
             logger.warning(
                 "Unsupported output mode. Received %s, Support %s",
                 task_send_params.acceptedOutputModes,
-                BurgerSellerAgent.SUPPORTED_CONTENT_TYPES,
+                ScholarAgent.SUPPORTED_CONTENT_TYPES,
             )
             return utils.new_incompatible_types_error(request.id)
 
@@ -123,14 +123,8 @@ class AgentTaskManager(InMemoryTaskManager):
 
         parts = [{"type": "text", "text": agent_response["content"]}]
         artifact = None
-        if agent_response["require_user_input"]:
-            task_status = TaskStatus(
-                state=TaskState.INPUT_REQUIRED,
-                message=Message(role="agent", parts=parts),
-            )
-        else:
-            task_status = TaskStatus(state=TaskState.COMPLETED)
-            artifact = Artifact(parts=parts)
+        task_status = TaskStatus(state=TaskState.COMPLETED)
+        artifact = Artifact(parts=parts)
         task = await self.update_store(
             task_id, task_status, None if artifact is None else [artifact]
         )

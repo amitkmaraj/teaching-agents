@@ -18,7 +18,7 @@ from a2a_server.server import A2AServer
 from a2a_types import AgentCard, AgentCapabilities, AgentSkill, AgentAuthentication
 from a2a_server.push_notification_auth import PushNotificationSenderAuth
 from task_manager import AgentTaskManager
-from agent import BurgerSellerAgent
+from agent import TeacherAgent
 import click
 import logging
 from dotenv import load_dotenv
@@ -34,26 +34,26 @@ logger = logging.getLogger(__name__)
 @click.option("--host", "host", default="0.0.0.0")
 @click.option("--port", "port", default=10001)
 def main(host, port):
-    """Starts the Burger Seller Agent server."""
+    """Starts the Teacher Agent server."""
     try:
         capabilities = AgentCapabilities(pushNotifications=True)
         skill = AgentSkill(
-            id="create_burger_order",
-            name="Burger Order Creation Tool",
-            description="Helps with creating burger orders",
-            tags=["burger order creation"],
-            examples=["I want to order 2 classic cheeseburgers"],
+            id="teach_topic",
+            name="Learn a new Topic",
+            description="Helps to teach new topics",
+            tags=["learn new topic"],
+            examples=["Teach me about Linear Algebra"],
         )
         agent_card = AgentCard(
-            name="burger_seller_agent",
-            description="Helps with creating burger orders",
+            name="teacher_agent",
+            description="Teaches new topics",
             # The URL provided here is for the sake of demo,
             # in production you should use a proper domain name
             url=f"http://{host}:{port}/",
             version="1.0.0",
-            authentication=AgentAuthentication(schemes=["Basic"]),
-            defaultInputModes=BurgerSellerAgent.SUPPORTED_CONTENT_TYPES,
-            defaultOutputModes=BurgerSellerAgent.SUPPORTED_CONTENT_TYPES,
+            authentication=AgentAuthentication(schemes=["Bearer"]),
+            defaultInputModes=TeacherAgent.SUPPORTED_CONTENT_TYPES,
+            defaultOutputModes=TeacherAgent.SUPPORTED_CONTENT_TYPES,
             capabilities=capabilities,
             skills=[skill],
         )
@@ -63,13 +63,12 @@ def main(host, port):
         server = A2AServer(
             agent_card=agent_card,
             task_manager=AgentTaskManager(
-                agent=BurgerSellerAgent(),
+                agent=TeacherAgent(),
                 notification_sender_auth=notification_sender_auth,
             ),
             host=host,
             port=port,
-            auth_username=os.environ.get("AUTH_USERNAME"),
-            auth_password=os.environ.get("AUTH_PASSWORD"),
+            api_key=os.environ.get("API_KEY"),
         )
 
         server.app.add_route(

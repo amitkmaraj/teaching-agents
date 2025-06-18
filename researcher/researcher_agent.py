@@ -37,10 +37,10 @@ from a2a_types import (
 )
 
 
-class PurchasingAgent:
-    """The purchasing agent.
+class ResearcherAgent:
+    """The researcher agent.
 
-    This is the agent responsible for choosing which remote seller agents to send
+    This is the agent responsible for choosing which remote seller researcher to send
     tasks to and coordinate their work.
     """
 
@@ -77,8 +77,8 @@ class PurchasingAgent:
             instruction=self.root_instruction,
             before_model_callback=self.before_model_callback,
             description=(
-                "This purchasing agent orchestrates the decomposition of the user purchase request into"
-                " tasks that can be performed by the seller agents."
+                "This researcher agent orchestrates the decomposition of the user inquiry request into"
+                " tasks that can be performed by the researcher agents."
             ),
             tools=[
                 self.send_task,
@@ -87,20 +87,16 @@ class PurchasingAgent:
 
     def root_instruction(self, context: ReadonlyContext) -> str:
         current_agent = self.check_active_agent(context)
-        return f"""You are an expert purchasing delegator that can delegate the user product inquiry and purchase request to the
-appropriate seller remote agents.
+        return f"""You are an expert researcher that can learn about topics and create requests to the
+appropriate researcher remote agents. Your goal is to accept a topic from a user, route it to an agent that can research and learn about the topic.
+Then, you need to take all that information and feed it to another agent that can teach it. The final teachable response should be sent to the user.
 
 Execution:
 - For actionable tasks, you can use `send_task` to assign tasks to remote agents to perform.
-- When the remote agent is repeatedly asking for user confirmation, assume that the remote agent doesn't have access to user's conversation context. 
-    So improve the task description to include all the necessary information related to that agent
 - Never ask user permission when you want to connect with remote agents. If you need to make connection with multiple remote agents, directly
     connect with them without asking user permission or asking user preference
-- Always show the detailed response information from the seller agent and propagate it properly to the user. 
-- If the remote seller is asking for confirmation, rely the confirmation question to the user if the user haven't do so. 
+- Always show the detailed response information from the researcher agent and propagate it properly to the user.  
 - If the user already confirmed the related order in the past conversation history, you can confirm on behalf of the user
-- Do not give irrelevant context to remote seller agent. For example, ordered pizza item is not relevant for the burger seller agent
-- Never ask order confirmation to the remote seller agent 
 
 Please rely on tools to address the request, and don't make up the response. If you are not sure, please ask the user for more details.
 Focus on the most recent parts of the conversation primarily.
@@ -110,7 +106,7 @@ If there is an active agent, send the request to that agent with the update task
 Agents:
 {self.agents}
 
-Current active seller agent: {current_agent["active_agent"]}
+Current active researcher agent: {current_agent["active_agent"]}
 """
 
     def check_active_agent(self, context: ReadonlyContext):
@@ -146,14 +142,14 @@ Current active seller agent: {current_agent["active_agent"]}
         return remote_agent_info
 
     async def send_task(self, agent_name: str, task: str, tool_context: ToolContext):
-        """Sends a task to remote seller agent
+        """Sends a task to remote agent
 
         This will send a message to the remote agent named agent_name.
 
         Args:
             agent_name: The name of the agent to send the task to.
             task: The comprehensive conversation context summary
-                and goal to be achieved regarding user inquiry and purchase request.
+                and goal to be achieved regarding user inquiry and information.
             tool_context: The tool context this method runs in.
 
         Yields:
@@ -201,10 +197,7 @@ Current active seller agent: {current_agent["active_agent"]}
             TaskState.FAILED,
             TaskState.UNKNOWN,
         ]
-        if task.status.state == TaskState.INPUT_REQUIRED:
-            # Force user input back
-            tool_context.actions.escalate = True
-        elif task.status.state == TaskState.COMPLETED:
+        if task.status.state == TaskState.COMPLETED:
             # Reset active agent is task is completed
             state["active_agent"] = "None"
 

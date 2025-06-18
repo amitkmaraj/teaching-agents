@@ -12,8 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+FROM python:3.12-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-AUTH_USERNAME=burgeruser123
-AUTH_PASSWORD=burgerpass123
-GCLOUD_LOCATION=us-central1
-GCLOUD_PROJECT_ID={your-project-id}
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+ADD . /app
+WORKDIR /app
+
+RUN uv sync --frozen
+
+EXPOSE 8080
+
+ENV PYTHONUNBUFFERED=1
+
+ENTRYPOINT ["uv", "run", ".", "--host", "0.0.0.0", "--port", "8080"]

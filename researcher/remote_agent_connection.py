@@ -33,7 +33,8 @@ TaskCallbackArg = Task | TaskStatusUpdateEvent | TaskArtifactUpdateEvent
 TaskUpdateCallback = Callable[[TaskCallbackArg, AgentCard], Task]
 
 KNOWN_AUTH = {
-    "pizza_seller_agent": os.getenv("PIZZA_SELLER_AGENT_AUTH", "api_key"),
+    "scholar_agent": os.getenv("SCHOLAR_AGENT_AUTH", "api_key"),
+    "teacher_agent": os.getenv("TEACHER_AGENT_AUTH", "api_key"),
     "burger_seller_agent": os.getenv("BURGER_SELLER_AGENT_AUTH", "user:pass"),
 }
 
