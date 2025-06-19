@@ -55,7 +55,7 @@ class ScholarAgent:
 
     def __init__(self):
         self.model = ChatVertexAI(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             location=os.getenv("GCLOUD_LOCATION"),
             project=os.getenv("GCLOUD_PROJECT_ID"),
         )

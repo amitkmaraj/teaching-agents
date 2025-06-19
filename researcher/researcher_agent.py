@@ -72,8 +72,8 @@ class ResearcherAgent:
 
     def create_agent(self) -> Agent:
         return Agent(
-            model="gemini-2.0-flash-001",
-            name="purchasing_agent",
+            model="gemini-2.5-flash",
+            name="researcher_agent",
             instruction=self.root_instruction,
             before_model_callback=self.before_model_callback,
             description=(

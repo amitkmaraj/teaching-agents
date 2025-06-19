@@ -27,5 +27,12 @@ RUN uv sync --frozen
 EXPOSE 8080
 
 ENV PYTHONUNBUFFERED=1
+ENV GOOGLE_GENAI_USE_VERTEXAI=True
+ENV GOOGLE_CLOUD_PROJECT=amaraj-development
+ENV GOOGLE_CLOUD_LOCATION=us-central1
+ENV SCHOLAR_AGENT_AUTH=pizza123
+ENV SCHOLAR_AGENT_URL=https://scholar-agent-795845071313.us-central1.run.app
+ENV TEACHER_AGENT_AUTH=pizza123
+ENV TEACHER_AGENT_URL=https://teacher-agent-795845071313.us-central1.run.app
 
 ENTRYPOINT ["uv", "run", "researcher_demo.py"]
