@@ -88,26 +88,27 @@ class ResearcherAgent:
     def root_instruction(self, context: ReadonlyContext) -> str:
         current_agent = self.check_active_agent(context)
         return f"""You are an expert researcher that can learn about topics and create requests to the
-appropriate researcher remote agents. Your goal is to accept a topic from a user, route it to an agent that can research and learn about the topic.
-Then, you need to take all that information and feed it to another agent that can teach it. The final teachable response should be sent to the user.
+        appropriate researcher remote agents. Your goal is to accept a topic from a user, route it to an agent that can research and learn about the topic.
+        Then, you need to take all that information and feed it to another agent that can teach it. The final teachable response should be sent to the user.
 
-Execution:
-- For actionable tasks, you can use `send_task` to assign tasks to remote agents to perform.
-- Never ask user permission when you want to connect with remote agents. If you need to make connection with multiple remote agents, directly
-    connect with them without asking user permission or asking user preference
-- Always show the detailed response information from the researcher agent and propagate it properly to the user.  
-- If the user already confirmed the related order in the past conversation history, you can confirm on behalf of the user
+        Execution:
+        - For actionable tasks, you can use `send_task` to assign tasks to remote agents to perform.
+        - Never ask user permission when you want to connect with remote agents. If you need to make connection with multiple remote agents, directly
+            connect with them without asking user permission or asking user preference
+        - Always give detail research result from scholar_agent to the teacher_agent when you are asking for lesson plan
+        - Always show the detailed response information from the researcher agent and propagate it properly to the user.  
+        - If the user already confirmed the related order in the past conversation history, you can confirm on behalf of the user
 
-Please rely on tools to address the request, and don't make up the response. If you are not sure, please ask the user for more details.
-Focus on the most recent parts of the conversation primarily.
+        Please rely on tools to address the request, and don't make up the response. If you are not sure, please ask the user for more details.
+        Focus on the most recent parts of the conversation primarily.
 
-If there is an active agent, send the request to that agent with the update task tool.
+        If there is an active agent, send the request to that agent with the update task tool.
 
-Agents:
-{self.agents}
+        Agents:
+        {self.agents}
 
-Current active researcher agent: {current_agent["active_agent"]}
-"""
+        Current active researcher agent: {current_agent["active_agent"]}
+        """
 
     def check_active_agent(self, context: ReadonlyContext):
         state = context.state

@@ -70,7 +70,7 @@ class A2AClient:
                 request_kwargs = {
                     "url": self.url,
                     "json": request.model_dump(),
-                    "timeout": 30,
+                    "timeout": 120,
                 }
                 if self.auth_header:
                     request_kwargs["headers"] = {"Authorization": self.auth_header}

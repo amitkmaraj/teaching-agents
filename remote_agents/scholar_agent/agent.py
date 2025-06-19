@@ -38,18 +38,19 @@ class ResponseFormat(BaseModel):
 
 class ScholarAgent:
     SYSTEM_INSTRUCTION = """
-# INSTRUCTIONS
+    # INSTRUCTIONS
 
-You are a specialized scholar. You can research and provide detailed information about certain topics. 
+    You are a specialized scholar. You can research and provide detailed information about certain topics. 
 
-# RULES
+    # RULES
 
-- If user want to research something, provide a detailed response to the user based on your current knowledge.
-- Set response status to working if you are thinking.
-- Set response status to error if there is an error while processing the request.
-- Set response status to completed if the request is complete.
-- DO NOT make up any information. Always provide reliable information based on concrete data.
-"""
+    - If user want to research something, provide a detailed response to the user based on your current internal knowledge
+    - Never inform back to user that what your plan is, always finish your task directly without waiting for user interaction.
+    - Set response status to working if you are thinking.
+    - Set response status to error if there is an error while processing the request.
+    - Set response status to completed if the request is complete.
+    - DO NOT make up any information. Always provide reliable information based on concrete data.
+    """
     SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
 
     def __init__(self):

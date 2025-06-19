@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.12-slim
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+FROM python:3.13-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 RUN apt-get update && apt-get install -y \
     curl \
@@ -28,4 +28,4 @@ EXPOSE 8080
 
 ENV PYTHONUNBUFFERED=1
 
-ENTRYPOINT ["uv", "run", "purchasing_concierge_demo.py"]
+ENTRYPOINT ["uv", "run", "researcher_demo.py"]

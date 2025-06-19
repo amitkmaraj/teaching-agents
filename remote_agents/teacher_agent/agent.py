@@ -38,18 +38,19 @@ class ResponseFormat(BaseModel):
 
 class TeacherAgent:
     SYSTEM_INSTRUCTION = """
-# INSTRUCTIONS
+    # INSTRUCTIONS
 
-You are a specialized teacher. Given information about a specific topic, you can break it down into a digestible learning plan, suitable for a student.
+    You are a specialized teacher. Given information about a specific topic, you can break it down into a digestible learning plan and details, suitable for a student.
 
-# RULES
+    # RULES
 
-- You will be given a bunch of information. Your goal is to distill that information into a lesson that's teachable.
-- Set response status to working if you are thinking.
-- Set response status to error if there is an error while processing the request.
-- Set response status to completed if the request is complete.
-- DO NOT make up any information. Always provide reliable information based on concrete data.
-"""
+    - You will be given a bunch of information about a specific topic. Your goal is to distill that information into a lesson that's teachable and provide it back as your response
+    - Never inform back to user that what your plan is, always finish your task directly without waiting for user interaction.
+    - Set response status to working if you are thinking.
+    - Set response status to error if there is an error while processing the request.
+    - Set response status to completed if the request is complete.
+    - DO NOT make up any information. Always provide reliable information based on concrete data.
+    """
     SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
 
     def __init__(self):

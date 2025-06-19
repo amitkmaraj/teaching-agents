@@ -24,6 +24,5 @@ root_agent = ResearcherAgent(
     remote_agent_addresses=[
         os.getenv("SCHOLAR_AGENT_URL", "http://localhost:10000"),
         os.getenv("TEACHER_AGENT_URL", "http://localhost:10001"),
-        os.getenv("BURGER_SELLER_AGENT_URL", "http://localhost:10001"),
     ]
 ).create_agent()
